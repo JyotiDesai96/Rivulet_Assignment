@@ -1,0 +1,362 @@
+<template>
+	<div style="width:100%;">
+		<div class="row t-margin">
+			<q-table
+				id="custom-table"
+				:pagination="initialPagination"
+				virtual-scroll
+				style="width: 100%;		border-radius: 15px;"
+				table-header-class="bg-grey-7 text-white"
+				class="customers shadow-3"
+        :data="currentstatus.csdat"
+        :columns="statusColumns"
+        row-key="name" dense
+			>
+				<template v-slot:top>
+					<label class="title">Current status</label>
+				</template>
+        
+				<template v-slot:body="props">
+					<q-tr :props="props" @click="rowDetails(props.row)" dense>
+						<q-td dense key="OpportunityName" :props="props" >
+							<q-item-label><b>{{ props.row.OpportunityName}}</b></q-item-label>
+						</q-td>
+						<q-td dense key="BizCaseNo" :props="props" >
+							<q-item-label><b>{{ props.row.BizCaseNo ? props.row.BizCaseNo : ''}}</b></q-item-label>
+						</q-td>
+            <q-td dense key="PreviousFollowUp" :props="props" >
+							<q-item-label><b>{{ props.row.PreviousFollowUp ? props.row.PreviousFollowUp.slice(0,10) : ''}}</b></q-item-label>
+						</q-td>
+						<q-td dense key="fullName" :props="props" >
+							<q-item-label><b>{{ props.row.fullName}}</b></q-item-label>
+						</q-td>
+            <q-td dense key="Opportunity_Name_Affix_c" :props="props" >
+							<q-item-label><b>{{ props.row.Opportunity_Name_Affix_c}}</b></q-item-label>
+						</q-td>
+						<q-td dense key="TaskStatus" :props="props" >
+							<q-item-label><b>{{ props.row.TaskStatus}}</b></q-item-label>
+						</q-td>
+						<q-td dense key="DaysDue" :props="props" >
+							<q-item-label><b>{{ props.row.DaysDue}}</b></q-item-label>
+						</q-td>
+						<q-td dense key="remind" :props="props" >
+							<q-btn size="sm" no-caps color="amber-7" label="Remind" @click="RemindEmail(props.row)"/>
+						</q-td>
+					</q-tr>
+				</template>
+			</q-table>
+		</div>
+
+		<q-dialog v-model="statusDetailsDailog" persistent>
+      <q-card style="width: 1000px; max-width: 80vw;">
+        <div style="justify-content: flex-end;display: flex;">
+          <q-btn icon="close" flat round dense v-close-popup size="md"/>
+        </div>
+        <q-card-section class="shadow-3" style="padding:0px 16px 16px 16px;    box-shadow: 0 5px 8px -4px #00000059 !important;">
+					<div class="row">
+						<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+							<div class="row head-margin">
+								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 headcontent">
+									<label >Opportunity Name</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 input">
+									<div>22-10-2021</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+							<div class="row head-margin">
+								<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6 headcontent">
+									<label >Biz-case</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-xs-6 input">
+									<div>22-10-2021</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+							<div class="row head-margin">
+								<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6 headcontent">
+									<label >Close Date</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-xs-6 input">
+									<div>22-10-2021</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+							<div class="row head-margin">
+								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 headcontent">
+									<label >Previous follow up</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 input">
+									<div>22-10-2021</div>
+								</div>
+							</div>
+						</div>
+					</div>
+						<div class="row">
+						<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+							<div class="row head-margin">
+								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 headcontent">
+									<label >Opportunity Subtitle</label>
+								</div>
+								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 input">
+									<div>22-10-2021</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
+							<div class="row head-margin">
+								<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6 headcontent">
+									<label >Status</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-xs-6 input">
+									<div>22-10-2021</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+							<div class="row head-margin">
+								<div class="col-lg-5 col-md-5 col-sm-6 col-xs-6 headcontent">
+									<label >Go Live Date</label>
+								</div>
+								<div class="col-lg-7 col-md-7 col-sm-6 col-xs-6 input">
+									<div>22-10-2021</div>
+								</div>
+							</div>
+						</div>
+					</div>
+        </q-card-section>
+
+					<q-table
+						id="custom-table"
+						:pagination="statusPagination"
+						virtual-scroll
+						style="width: 100%;padding: 5px;"
+						table-header-class="bg-grey-7 text-white"
+						class="customers shadow-3"
+						:data="currentstatus.csdat"
+						:columns="statusDetailsColumns"
+						row-key="name" dense
+					>
+						<template v-slot:body="props">
+							<q-tr :props="props" @click="rowDetails(props.row)" dense>
+								<q-td dense key="OpportunityName" :props="props" >
+									<q-item-label><b>{{ props.row.OpportunityName}}</b></q-item-label>
+								</q-td>
+								<q-td dense key="BizCaseNo" :props="props" >
+									<q-item-label><b>{{ props.row.BizCaseNo ? props.row.BizCaseNo : ''}}</b></q-item-label>
+								</q-td>
+								<q-td dense key="PreviousFollowUp" :props="props" >
+									<q-item-label><b>{{ props.row.PreviousFollowUp ? props.row.PreviousFollowUp.slice(0,10) : ''}}</b></q-item-label>
+								</q-td>
+								<q-td dense key="fullName" :props="props" >
+									<q-item-label><b>{{ props.row.fullName}}</b></q-item-label>
+								</q-td>
+								<q-td dense key="Opportunity_Name_Affix_c" :props="props" >
+									<q-item-label><b>{{ props.row.Opportunity_Name_Affix_c}}</b></q-item-label>
+								</q-td>
+								<q-td dense key="TaskStatus" :props="props" >
+									<q-item-label><b>{{ props.row.TaskStatus}}</b></q-item-label>
+								</q-td>
+								<q-td dense key="DaysDue" :props="props" >
+									<q-item-label><b>{{ props.row.DaysDue}}</b></q-item-label>
+								</q-td>
+								<q-td dense key="remind" :props="props" >
+									<q-btn size="sm" no-caps color="amber-7" label="Remind" @click="RemindEmail(props.row)"/>
+								</q-td>
+							</q-tr>
+						</template>
+					</q-table>
+			
+      </q-card>
+    </q-dialog>
+	</div>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+import moment from "moment";
+
+	export default {
+		data(){
+			return{
+				statusDetailsDailog:false,
+				initialPagination: {
+          sortBy: 'desc',
+          descending: false,
+          page: 1,
+          rowsPerPage: 20
+				},
+				statusPagination: {
+          sortBy: 'desc',
+          descending: false,
+          page: 1,
+          rowsPerPage: 5
+				},
+				statusColumns:[
+          {name: 'OpportunityName',required: true,label: 'Opportunity Name',align: 'left',field: row => row.OpportunityName,format: val => `${val}`,sortable: true},
+          { name: 'BizCaseNo', align: 'left', label: 'Bizcase number', field: 'BizCaseNo', sortable: true },
+          { name: 'PreviousFollowUp', align: 'left', label: 'Previous follow up', field: 'PreviousFollowUp', sortable: true },
+          { name: 'fullName', align: 'left', label: 'Responsible Name', field: 'fullName', sortable: true },
+          { name: 'Opportunity_Name_Affix_c', align: 'left', label: 'Opportunity subject', field: 'Opportunity_Name_Affix_c', sortable: true },
+          { name: 'TaskStatus',align: 'left', label: 'Status', field: 'TaskStatus', sortable: true },
+          { name: 'DaysDue', align: 'left', label: 'Days Due', field: 'DaysDue', sortable: true },
+          { name: 'remind', align: 'left', label: 'Remind', field: 'remind', sortable: true }
+        ],
+				statusDetailsColumns:[
+					{ name: 'BizCaseNo', align: 'center', label: 'Date', field: 'BizCaseNo', sortable: true },
+          { name: 'fullName', align: 'center', label: 'User', field: 'fullName', sortable: true },
+          { name: 'Opportunity_Name_Affix_c', align: 'center', label: 'Description', field: 'Opportunity_Name_Affix_c', sortable: true },
+          { name: 'DaysDue', align: 'center', label: 'Follow Up Date', field: 'DaysDue', sortable: true },
+        ],
+        statusData:[
+          {
+            name: 'John',
+            lastfollowup:'19/08/2020',
+            responsible: "Marco",
+            status: "Send quotation",
+            daysdue:'21/10/2020'
+          },
+
+        ],
+			}
+    },
+    created(){
+    },
+		props:['currentstatus'],
+    computed:{
+      ...mapState({
+        
+      })
+    },
+		methods:{
+			
+      RemindClick(){
+
+      },
+      RemindEmail(customer){
+        console.log("fullName", customer.fullName);
+      this.$store.dispatch("RemindEmail", {this:this, opName:customer.fullName,opNumber:customer.BizCaseNo})
+        .then((data) => {
+        })
+        .catch(err => {
+            console.log("ERRORs",err);
+        })
+      },
+			rowDetails(details){
+				console.log("rowDetails",details);
+				this.statusDetailsDailog=true;
+			},
+    },
+    filters: {
+      formatDate(date) {
+        return moment(date).format('DD-MM-YYYY');
+      }
+    }
+	}
+</script>
+
+<style scoped>
+	.title{
+		font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.2px;
+	}
+	q-table_top{
+		font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.2px;
+	}
+	.sub-title{
+		letter-spacing: 0.2px;
+		font-size: 13px;
+		padding: 10px;
+		font-weight: 600;
+		margin-top: 0px;
+		color:rgb(85, 83, 83);
+	}
+	.sub-title-no{
+		font-size: 34px;
+		font-weight: 600;
+		color:rgb(85, 83, 83);
+	}
+.customers td, .customers th {
+  padding: -10px;
+}
+.t-margin {
+  /*padding: 20px 30px;
+	width: 610px; */
+  background-color: white;
+  position: relative;
+  border-radius: 6px;
+}
+td{
+  padding:-5px 0px 0px 0px;
+}
+.customers td, .customers th {
+  padding: -10px;
+}
+
+.col-margin{
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+.col-pad{
+	padding-right: 10px;
+}
+	#custom-table th {
+		border-radius: 6px;
+		border: 1px solid #26193c;
+		color:white;
+		font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+		background:#26193c;
+	}
+	#custom-table table{
+		border-spacing: 5px !important;
+	}
+	#custom-table table tr{
+		background:none;
+	}
+	.headcontent{
+		letter-spacing: 0.2px;
+		font-size: 14px;
+		font-weight: 600;
+		color:rgb(85, 83, 83);
+		text-transform:capitalize;
+		display: flex;
+    justify-content: center;
+    align-items: center;
+	}
+	.btn-status{
+		width:100%;
+		text-transform:none;
+	}
+	.head-margin{
+		padding: 5px 5px;
+	}
+	.input{
+		display: flex;
+    border: #808080d4 1.5px solid;
+    padding: 2px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+	}
+</style>
+
+
+
+//APPROVAL
+<q-dialog
+v-model="dialog"
+persistent
+:maximized="maximizedToggle"
+transition-show="slide-up"
+transition-hide="slide-down"
+>
